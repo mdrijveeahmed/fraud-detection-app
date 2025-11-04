@@ -11,15 +11,16 @@ st.write("This page shows insights from a sample of the credit card dataset.")
 # --- Load Data ---
 @st.cache_data
 def load_data():
-    # এইবার আমরা ছোট স্যাম্পল ফাইলটি লোড করবো
-    data_url = 'card_sample.csv' 
+    # --- এই লাইনটি পরিবর্তন করা হয়েছে ---
+    data_url = 'card_sample_small.csv' 
+    # --- ---
 
     try:
         df = pd.read_csv(data_url)
         return df
     except FileNotFoundError:
         st.error(f"Error: '{data_url}' not found in your GitHub repository.")
-        st.warning("Please ensure you have created and uploaded 'card_sample.csv' from Google Colab.")
+        st.warning(f"Please ensure you have uploaded '{data_url}' to GitHub.")
         return None
 
 df = load_data()
@@ -36,7 +37,7 @@ if df is not None:
     try:
         fig, ax = plt.subplots(figsize=(7, 5))
         sns.countplot(x='Class', data=df, ax=ax, palette=['#34A853', '#EA4335'])
-        ax.set_title('Normal (0) vs. Fraud (1) (in 50k sample)')
+        ax.set_title(f'Normal (0) vs. Fraud (1) (in {len(df)} sample)')
         ax.set_xticklabels(['Normal (0)', 'Fraud (1)'])
         st.pyplot(fig)
         
@@ -52,7 +53,7 @@ if df is not None:
     st.write("How does the transaction amount differ between normal and fraudulent cases?")
 
     try:
-        # Filter for rows where Amount > 0 to avoid log(0) issues if using log_scale
+        # Filter for rows where Amount > 0
         df_plot = df[df['Amount'] > 0].copy()
 
         fig_amt, (ax1, ax2) = plt.subplots(ncols=2, figsize=(18, 6))
@@ -62,7 +63,7 @@ if df is not None:
         ax1.set_title('Normal Transaction Amount')
         ax1.set_xlabel('Amount')
         ax1.set_ylabel('Frequency')
-        ax1.set_xlim(0, 3000) # Limiting x-axis to see details
+        ax1.set_xlim(0, 3000) # Limiting x-axis
 
         # Fraudulent transactions
         if 1 in df_plot['Class'].values:
@@ -80,4 +81,4 @@ if df is not None:
     except Exception as e:
         st.error(f"Could not draw amount plot: {e}")
 else:
-    st.info("Waiting for 'card_sample.csv' to be uploaded to GitHub...")
+    st.info(f"Waiting for 'card_sample_small.csv' to be uploaded to GitHub...")
