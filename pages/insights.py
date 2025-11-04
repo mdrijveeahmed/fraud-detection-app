@@ -11,9 +11,7 @@ st.write("This page shows insights from a sample of the credit card dataset.")
 # --- Load Data ---
 @st.cache_data
 def load_data():
-    # --- এই লাইনটি পরিবর্তন করা হয়েছে ---
     data_url = 'card_sample_small.csv' 
-    # --- ---
 
     try:
         df = pd.read_csv(data_url)
@@ -50,33 +48,33 @@ if df is not None:
 
     # --- 2. Transaction Amount Distribution ---
     st.header("2. Transaction Amount Distribution")
-    st.write("How does the transaction amount differ between normal and fraudulent cases?")
+    st.write("How does the *scaled* transaction amount differ between normal and fraudulent cases?")
 
     try:
-        # Filter for rows where Amount > 0
-        df_plot = df[df['Amount'] > 0].copy()
-
+        # --- এই সেকশনটি ঠিক করা হয়েছে ---
+        # আমরা 'Amount' এর বদলে 'scaled_amount' ব্যবহার করবো
+        
         fig_amt, (ax1, ax2) = plt.subplots(ncols=2, figsize=(18, 6))
 
         # Normal transactions
-        sns.histplot(df_plot[df_plot['Class'] == 0]['Amount'], bins=100, ax=ax1, color='green', kde=True)
-        ax1.set_title('Normal Transaction Amount')
-        ax1.set_xlabel('Amount')
+        sns.histplot(df[df['Class'] == 0]['scaled_amount'], bins=100, ax=ax1, color='green', kde=True)
+        ax1.set_title('Normal Transaction (Scaled Amount)')
+        ax1.set_xlabel('Scaled Amount')
         ax1.set_ylabel('Frequency')
-        ax1.set_xlim(0, 3000) # Limiting x-axis
 
         # Fraudulent transactions
-        if 1 in df_plot['Class'].values:
-            sns.histplot(df_plot[df_plot['Class'] == 1]['Amount'], bins=50, ax=ax2, color='red', kde=True)
-            ax2.set_title('Fraudulent Transaction Amount')
+        if 1 in df['Class'].values:
+            sns.histplot(df[df['Class'] == 1]['scaled_amount'], bins=50, ax=ax2, color='red', kde=True)
+            ax2.set_title('Fraudulent Transaction (Scaled Amount)')
         else:
             ax2.set_title('No Fraudulent Transactions in this sample')
             
-        ax2.set_xlabel('Amount')
+        ax2.set_xlabel('Scaled Amount')
         ax2.set_ylabel('Frequency')
 
         st.pyplot(fig_amt)
-        st.info("Note: Most transactions (both normal and fraudulent) are for small amounts.")
+        st.info("Note: 'Scaled Amount' হলো আসল Amount-এর একটি স্ট্যান্ডার্ডাইজড ভার্সন।")
+        # --- ---
 
     except Exception as e:
         st.error(f"Could not draw amount plot: {e}")
